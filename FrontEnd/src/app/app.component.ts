@@ -10,24 +10,32 @@ import { APIResponse } from './models/apiresponse.model';
 export class AppComponent {
   newsStories:any;
   apiResponse:APIResponse = new APIResponse();
+  searchText:string = '';
+  pageSize:number = 10;
   constructor(private newsService:NewsService){
-    this.LoadStories('');
+    this.LoadStories();
   }
-  LoadStories(searchText:string)
+  LoadStories()
   {
-    this.newsService.GetStories(searchText).subscribe(result=>{
+    this.newsService.GetStories(this.searchText, this.pageSize).subscribe(result=>{
       this.apiResponse = result;
       this.newsStories= this.apiResponse.data;
     });
   }
-  onSearchChange(searchText: string): void {  
-    this.LoadStories(searchText); 
+  onSearchChange(value: string): void {  
+    this.searchText = value;
+    this.LoadStories(); 
   }
   getStoriesByUrl(uri:string){
     this.newsService.GetStoriesByUri(uri).subscribe(result=>{
       this.apiResponse = result;
       this.newsStories= this.apiResponse.data;
     });
+  }
+  onPageSizeChange(value:number)
+  {
+    this.pageSize = value;
+    this.LoadStories()
   }
   title = 'FrontEnd';
 }
