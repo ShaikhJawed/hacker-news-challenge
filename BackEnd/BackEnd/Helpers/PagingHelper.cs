@@ -23,8 +23,15 @@ namespace BackEnd.Helpers
                 pageNumber  - 1 >= 1 && pageNumber <= roundedTotalPages
                 ? uriService.GetPageUri(pageNumber - 1, pageSize, route)
                 : null;
-            respose.FirstPage = uriService.GetPageUri(1, pageSize, route);
-            respose.LastPage = uriService.GetPageUri(roundedTotalPages, pageSize, route);
+            respose.FirstPage =
+                pageNumber - 1 >= 1 && pageNumber <= roundedTotalPages
+                ? uriService.GetPageUri(1, pageSize, route)
+                : null;
+
+            respose.LastPage =
+                pageNumber >= 1 && pageNumber < roundedTotalPages
+                ? uriService.GetPageUri(roundedTotalPages, pageSize, route)
+                : null;
             respose.TotalPages = roundedTotalPages;
             respose.TotalRecords = totalRecords;
             return respose;
