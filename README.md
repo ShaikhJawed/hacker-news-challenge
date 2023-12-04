@@ -6,9 +6,8 @@ This project is a SPA built using Dot Net Core Web API and Angular  that interac
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Tests](#tests)
 - [Contributing](#contributing)
-- [License](#license)
+
 
 ## Installation
 
@@ -22,20 +21,20 @@ Open the solution in Visual Studio or your preferred IDE, and restore the NuGet 
 ## Usage
 1. **Run the Application:**
 
-Build and run the application.
+Build and run the application.  
 The application will interact with the third-party API to fetch top news stories.
 
 2. **Endpoints:**
 
-/api/news/top - Get top news stories.
-/api/news/search?query={searchTerm} - Search news based on a keyword.
-/api/news/page?pageNumber={pageNumber}&pageSize={pageSize} - Get paginated news.
+/api/news - Get top news stories.  
+/api/news?searchText={searchTerm} - Search news based on a keyword.  
+/api/news?searchText={searchTerm}&pageNumber={pageNumber}&pageSize={pageSize} - Get paginated news.  
 
 3. **Examples:**
 
-Get top news: GET /api/news/top
-Search news: GET /api/news/search?query=keyword
-Get paginated news: GET /api/news/page?pageNumber=1&pageSize=10
+Get top news: GET /api/news  
+Search news: GET /api/news?searchText=keyword  
+Get paginated news: GET /api/news?searchText=keyword&pageNumber=1&pageSize=10  
 
 ## Contributing
 Feel free to contribute to this project. If you find any issues or have suggestions, please open an issue or create a pull request.
