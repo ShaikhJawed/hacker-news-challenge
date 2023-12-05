@@ -20,21 +20,22 @@ namespace BackEnd.Controllers
         private INewsService _newsService;
         private IConfiguration _configuration;
         private IUriService _uriService;
-        private IMemoryCache _memoryCache;
-        private int _maxPageSize;
-        private int _minPageNumber;
-        private int _topStoriesLimit;
-        private int _cacheExpiryMinutes;
-        public NewsController(INewsService newsService, IConfiguration configuration, IUriService uriService, IMemoryCache memoryCache)
+        private ICacheWrapper _memoryCache;
+       private int _maxPageSize ;
+       private int _minPageNumber ;
+       private int _topStoriesLimit ;
+       private int _cacheExpiryMinutes;
+        public NewsController(INewsService newsService, IConfiguration configuration, IUriService uriService, ICacheWrapper memoryCache)
         {
             _newsService = newsService;
             _configuration = configuration;
             _uriService = uriService;
             _memoryCache = memoryCache;
-            _maxPageSize = _configuration.GetValue<int>("Limits:MaxPageSize");
-            _minPageNumber = _configuration.GetValue<int>("Limits:MinPageNumber");
-            _topStoriesLimit = _configuration.GetValue<int>("Limits:TopStories");
-            _cacheExpiryMinutes = _configuration.GetValue<int>("Limits:CacheExpiryMinutes");
+            _maxPageSize = Convert.ToInt32(_configuration.GetSection("Limits").GetSection("MaxPageSize").Value);
+            _minPageNumber = Convert.ToInt32(_configuration.GetSection("Limits").GetSection("MinPageNumber").Value);
+            _topStoriesLimit = Convert.ToInt32(_configuration.GetSection("Limits").GetSection("TopStories").Value);
+            _cacheExpiryMinutes = Convert.ToInt32(_configuration.GetSection("Limits").GetSection("CacheExpiryMinutes").Value); 
+            
         }
 
 
@@ -52,8 +53,8 @@ namespace BackEnd.Controllers
             {
 
                 //Getting top stories with details either from cache or API
-                Story[] results;
-                bool IsDataExistInCache = _memoryCache.TryGetValue("NewsStories", out results);
+                IEnumerable<Story> results;
+                bool IsDataExistInCache = _memoryCache.IsAvailableInCache("NewsStories", out results);
                 if (!IsDataExistInCache)
                 {
                     results = await GetStories();
@@ -73,6 +74,7 @@ namespace BackEnd.Controllers
                 var route = Request.Path.Value;
                 var pagedResponse = PagingHelper.CreatePagedReponse(filteredResult, pageNumber, pageSize, recordsCount, _uriService, route);
                 return Ok(pagedResponse);
+                
             }
             catch (Exception ex)
             {
@@ -81,7 +83,7 @@ namespace BackEnd.Controllers
             }
         }
 
-        private static IEnumerable<Story> filterStories(int pageNumber, int pageSize, string searchText, Story[] results)
+        private static IEnumerable<Story> filterStories(int pageNumber, int pageSize, string searchText, IEnumerable<Story> results)
         {
             return string.IsNullOrEmpty(searchText) ? results.Skip((pageNumber - 1) * pageSize).Take(pageSize)
                                                 : results
@@ -97,7 +99,7 @@ namespace BackEnd.Controllers
         /// Requests ids of limited top stories and gets their details
         /// </summary>
         /// <returns></returns>
-        private async Task<Story[]> GetStories()
+        private async Task<IEnumerable<Story>> GetStories()
         {
             var response = await _newsService.GetTopStories();
             var topStories = response.Take(_topStoriesLimit);

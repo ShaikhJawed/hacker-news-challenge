@@ -51,6 +51,8 @@ namespace BackEnd
 
             services.AddMemoryCache();
 
+            services.AddScoped<ICacheWrapper, CacheWrapper>();
+
             services.AddCors(options => {
                 options.AddPolicy("AllowAll", builder =>
                 builder.AllowAnyOrigin()
